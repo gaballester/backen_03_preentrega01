@@ -1,46 +1,97 @@
 import MockingService from "../services/mocks.service.js";
 import { petsService, usersService } from "../services/index.js";
 
+
+const defaultValues = {
+    users: 50,
+    pets: 100
+};
+
+const HTTP_STATUS = {
+    OK: 200,
+    INTERNAL_SERVER_ERROR: 500
+};
+
 const getMockingPets = async (req, res) => {
     try {
-        const pets = await MockingService.generateMockingPets(100);
-        res.json({status: "success", payload: pets});
+        const petsCount = parseInt(req.query.pets) || defaultValues.pets; 
+        const mockPets = await MockingService.generateMockingPets(petsCount);
+        return res.status(HTTP_STATUS.OK).json({
+            status: "success", 
+            payload: mockPets
+        });
     } catch (error) {
-        res.status(500).json({status: "error", message: "Error generating mock pets"});
+        console.error("Error generating mock pets:", error);
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: "error",
+            message: "Failed to generate mock pets",
+            error: error.message
+        });
     }
 };
 
 const getMockingUsers = async (req, res) => {
     try {
-        const users = await MockingService.generateMockingUsers(50);
-        res.json({status: "success", payload: users});
+        const usersCount = parseInt(req.query.users) || defaultValues.users;
+        const mockUsers = await MockingService.generateMockingUsers(usersCount);
+        return res.status(HTTP_STATUS.OK).json({
+            status: "success",
+            payload: mockUsers
+        });
     } catch (error) {
-        res.status(500).json({status: "error", message: "Error generating mock users"});
+        console.error("Error generating mock users:", error);
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: "error",
+            message: "Failed to generate mock users",
+            error: error.message
+        });
     }
 };
 
 const generateData = async (req, res) => {
-    const { users = 50, pets = 100 } = req.body; 
+    const { 
+        users = defaultValues.users, 
+        pets  =defaultValues.pets 
+    } = req.body; 
     try {
+        if (!Number.isInteger(users) || !Number.isInteger(pets) || users < 0 || pets < 0) {
+            return res.status(400).json({
+                status: "error",
+                message: "Users and pets counts must be positive integers"
+            });
+        }
+
+        // Generate mock data
         const [mockingUsers, mockingPets] = await Promise.all([
             MockingService.generateMockingUsers(users),
             MockingService.generateMockingPets(pets)
         ]);
 
+        // Save data to database
         await Promise.all([
             ...mockingUsers.map(user => usersService.create(user)),
             ...mockingPets.map(pet => petsService.create(pet))
         ]);
         
-        res.json({
+        return res.status(HTTP_STATUS.OK).json({
             status: "success",
-            message: "Users and Pets created successfully"
+            message: "Users and pets created successfully",
+            summary: {
+                usersCreated: mockingUsers.length,
+                petsCreated: mockingPets.length
+            }
         });
+
     } catch (error) {
         console.error("Error generating pets and users data:", error);
-        res.status(500).json({status: "error", message: "Server Error generating pets and users data"}); 
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            status: "error",
+            message: "Server error generating pets and users data",
+            error: error.message
+        });
     }
 };
+
 
 export default {
     getMockingPets,

@@ -9,3 +9,5 @@ import AdoptionRepository from "../repository/AdoptionRepository.js";
 export const usersService = new UserRepository(new Users());
 export const petsService = new PetRepository(new Pet());
 export const adoptionsService = new AdoptionRepository(new Adoption());
+
+

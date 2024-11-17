@@ -1,0 +1,174 @@
+paths:
+  /api/users/:
+    get:
+      summary: List all DB users
+      description: List users
+      tags:-tags:
+        - Users
+      responses:
+        200:
+          description: Success List of all db users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        500:
+          description: Internal Server Error
+    post:
+      summary: Create a new user
+      description: Create a new user
+      tags:-tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/createUser'
+      responses:
+        201:
+          description: Success user created
+        500:
+          description: Internal Server Error  
+      
+  /api/users/{uid}:
+    get:
+      summary: Get user by id
+      description: Get user by id
+      tags:
+        - Users
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: User id to find
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success user found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'  
+        500:
+          description: Internal Server Error
+    put:
+      summary: Update user by ID
+      description: Update user using ID parameter
+      tags:
+        - Users
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: User id to find
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/updateUser'
+      responses:
+        200:
+          description: Success user updated
+        500:
+          description: Internal Server Error
+        404:
+          description: User not found
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        first_name:
+          type: string
+          description: User First name
+        last_name:
+          type: string
+          description: User Last name
+        email:
+          type: string
+          description: User email
+        password:
+          type: string
+        role:
+          type: string
+          description: User role
+        pets:
+          type: array
+          items:
+      example:
+        _id: 123
+        first_name: John
+        last_name: Doe
+        email: 6H9a5@example.com
+        password: 123456
+        role: user
+        pets: ['123', '456']  
+  requestBodies:
+    createUser:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              first_name:
+                type: string
+                description: User First name
+              last_name:
+                type: string
+                description: User Last name
+              email:
+                type: string
+                description: User email
+              password:
+                type: string
+                description: User password
+              role:
+                type: string
+                description: User role
+            example:
+              first_name: John
+              last_name: Doe
+              email: 6H9a5@example.com
+              password: 123456
+              role: user  
+    updateUser:
+      required: true  
+      content:
+        application/json:
+          schema:
+            type: object  
+            properties:
+              first_name: 
+                type: string        
+                description: User First name
+              last_name:
+                type: string
+                description: User Last name
+              email:
+                type: string
+                description: User email
+              password:
+                type: string
+                description: User password
+              role:
+                type: string
+                description: User role
+            example:
+              first_name: John
+              last_name: Doe
+              email: 6H9a5@example.com
+              password: 123456
+              role: user
+              
+      

@@ -22,4 +22,9 @@ export default class Users {
     delete = (id) =>{
         return userModel.findByIdAndDelete(id);
     }
+
+    deleteAll = () =>{
+        return userModel.deleteMany({})
+    }
+
 }
