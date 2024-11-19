@@ -15,3 +15,4 @@ The pets  and users mocking generation, is available in test script. The test sc
 
 In a normal environment, the repository would be uploaded to GitHub without the tests, but since they are part of this submission and must be evaluated, they are included.
 
+To run the test use npm run test, that have an speciall setttings timeout.
